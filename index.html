@@ -206,150 +206,118 @@ let running=false;
 let currentCard=null;
 let audioCtx=null;
 
-function beep(freq,duration,type="sine",volume=.2){
+/* Upgraded audio generator with dual oscillators for maximum loudness and acoustic presence */
+function beep(freq1, freq2, duration, type = "sawtooth", volume = 0.8) {
+    if (!audioCtx)
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-    if(!audioCtx)
-        audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+    const osc1 = audioCtx.createOscillator();
+    const osc2 = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
 
-    const osc=audioCtx.createOscillator();
-    const gain=audioCtx.createGain();
+    osc1.type = type;
+    osc2.type = type;
 
-    osc.type=type;
-    osc.frequency.value=freq;
+    osc1.frequency.value = freq1;
+    osc2.frequency.value = freq2; // Slightly offset frequency creates a loud, penetrating acoustic beat
 
-    gain.gain.value=volume;
+    // Hold maximum volume until the last 30ms, then fade quickly to prevent speaker pops
+    gain.gain.setValueAtTime(volume, audioCtx.currentTime);
+    gain.gain.setValueAtTime(volume, audioCtx.currentTime + (duration - 30) / 1000);
+    gain.gain.linearRampToValueAtTime(0.0001, audioCtx.currentTime + duration / 1000);
 
-    osc.connect(gain);
+    osc1.connect(gain);
+    osc2.connect(gain);
     gain.connect(audioCtx.destination);
 
-    osc.start();
+    osc1.start();
+    osc2.start();
 
-    gain.gain.exponentialRampToValueAtTime(
-        0.0001,
-        audioCtx.currentTime+duration/1000
-    );
-
-    osc.stop(audioCtx.currentTime+duration/1000);
+    osc1.stop(audioCtx.currentTime + duration / 1000);
+    osc2.stop(audioCtx.currentTime + duration / 1000);
 }
 
-/* Pea whistle */
-function startSound(){
-
-    beep(1200,120,"square",0.3);
-
-    setTimeout(()=>{
-        beep(1500,120,"square",0.25);
-    },90);
-
+/* High-energy Referee Whistle / Air Horn */
+function startSound() {
+    beep(2000, 2050, 150, "sawtooth", 0.8);
+    setTimeout(() => {
+        beep(2400, 2460, 350, "sawtooth", 0.85);
+    }, 180);
 }
 
-/* Finish sound */
-function finishSound(){
-
-    beep(800,180,"triangle",0.25);
-
-    setTimeout(()=>{
-        beep(600,350,"triangle",0.25);
-    },170);
-
+/* Heavy Gym Buzzer / Stadium Horn */
+function finishSound() {
+    beep(350, 365, 250, "square", 0.85);
+    setTimeout(() => {
+        beep(350, 365, 250, "square", 0.85);
+    }, 300);
+    setTimeout(() => {
+        beep(300, 315, 650, "square", 0.9);
+    }, 600);
 }
 
 function clearEverything(){
-
     clearTimeout(timeout);
     clearInterval(interval);
-
     running=false;
-
     cancelBtn.classList.add("hidden");
-
     if(currentCard)
         currentCard.classList.remove("running");
-
     currentCard=null;
-
     countdown.textContent="";
 }
 
 function cancel(){
-
     clearEverything();
     message.textContent="Cancelled";
-
 }
 
 cancelBtn.onclick=cancel;
 
 document.querySelectorAll(".timer").forEach(card=>{
+    card.onclick=()=>{
+        if(running) return;
+        running=true;
+        currentCard=card;
+        card.classList.add("running");
+        cancelBtn.classList.remove("hidden");
 
-card.onclick=()=>{
+        const delay=Math.max(0,Number(delayInput.value)||0);
+        let remain=delay;
 
-if(running) return;
+        message.textContent="Starting...";
+        countdown.textContent=remain;
 
-running=true;
+        interval=setInterval(()=>{
+            remain--;
+            if(remain>0)
+                countdown.textContent=remain;
+        },1000);
 
-currentCard=card;
-card.classList.add("running");
-cancelBtn.classList.remove("hidden");
+        timeout=setTimeout(()=>{
+            clearInterval(interval);
+            startSound();
 
-const delay=Math.max(0,Number(delayInput.value)||0);
+            let left=Number(card.dataset.time);
+            message.textContent="Workout!";
+            countdown.textContent=left;
 
-let remain=delay;
+            interval=setInterval(()=>{
+                left--;
+                countdown.textContent=left;
 
-message.textContent="Starting...";
-
-countdown.textContent=remain;
-
-interval=setInterval(()=>{
-
-remain--;
-
-if(remain>0)
-    countdown.textContent=remain;
-
-},1000);
-
-timeout=setTimeout(()=>{
-
-clearInterval(interval);
-
-startSound();
-
-let left=Number(card.dataset.time);
-
-message.textContent="Workout!";
-countdown.textContent=left;
-
-interval=setInterval(()=>{
-
-left--;
-
-countdown.textContent=left;
-
-if(left<=0){
-
-clearInterval(interval);
-
-finishSound();
-
-message.textContent="Finished 🎉";
-
-countdown.textContent="";
-
-running=false;
-
-card.classList.remove("running");
-
-cancelBtn.classList.add("hidden");
-
-}
-
-},1000);
-
-},delay*1000);
-
-};
-
+                if(left<=0){
+                    clearInterval(interval);
+                    finishSound();
+                    message.textContent="Finished 🎉";
+                    countdown.textContent="";
+                    running=false;
+                    card.classList.remove("running");
+                    cancelBtn.classList.add("hidden");
+                }
+            },1000);
+        },delay*1000);
+    };
 });
 </script>
 
