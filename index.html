@@ -6,15 +6,35 @@
     <title>Workout Timer</title>
 
     <style>
+      /* Light Mode (Default) */
       :root {
-        --bg: #0f172a;
-        --card: #1e293b;
-        --card-hover: #334155;
-        --accent: #38bdf8;
-        --accent2: #22c55e;
+        --bg: #f3f4f6;
+        --surface: #ffffff;
+        --surface-hover: #f9fafb;
+        --border: #e5e7eb;
+        --text-main: #111827;
+        --text-muted: #6b7280;
+        --accent: #4f46e5;
+        --accent-glow: rgba(79, 70, 229, 0.15);
         --danger: #ef4444;
-        --text: #f8fafc;
-        --muted: #94a3b8;
+        --danger-hover: #dc2626;
+        --shadow:
+          0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+      }
+
+      /* Dark Mode (Automatic) */
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #0f172a;
+          --surface: #1e293b;
+          --surface-hover: #2dd4bf11; /* subtle tint */
+          --border: #334155;
+          --text-main: #f8fafc;
+          --text-muted: #94a3b8;
+          --accent: #2dd4bf;
+          --accent-glow: rgba(45, 212, 191, 0.15);
+          --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+        }
       }
 
       * {
@@ -22,172 +42,249 @@
         margin: 0;
         padding: 0;
         font-family:
-          Inter,
-          Segoe UI,
-          Arial,
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          Roboto,
           sans-serif;
       }
 
       body {
-        background: linear-gradient(135deg, #020617, #111827);
-        color: var(--text);
+        background-color: var(--bg);
+        color: var(--text-main);
         min-height: 100vh;
         display: flex;
         justify-content: center;
         align-items: center;
-        padding: 30px;
+        padding: 20px;
+        transition:
+          background-color 0.3s,
+          color 0.3s;
       }
 
       .container {
-        width: min(900px, 100%);
+        width: 100%;
+        max-width: 600px;
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
       }
 
-      h1 {
-        text-align: center;
-        font-size: 2.4rem;
-        margin-bottom: 10px;
-      }
-
-      .subtitle {
-        text-align: center;
-        color: var(--muted);
-        margin-bottom: 35px;
-      }
-
+      /* Settings UI */
       .settings {
         display: flex;
         justify-content: center;
         align-items: center;
         gap: 12px;
-        margin-bottom: 30px;
+        background: var(--surface);
+        padding: 12px 24px;
+        border-radius: 100px;
+        border: 1px solid var(--border);
+        box-shadow: var(--shadow);
+        width: fit-content;
+        margin: 0 auto;
+        transition: all 0.3s;
+      }
+
+      .settings label {
+        font-size: 1rem;
+        font-weight: 500;
+        color: var(--text-muted);
+      }
+
+      .input-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 6px;
       }
 
       .settings input {
-        width: 80px;
-        padding: 10px;
-        border: none;
-        border-radius: 10px;
-        background: #1e293b;
-        color: white;
+        width: 60px;
+        padding: 6px 8px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: var(--bg);
+        color: var(--text-main);
         text-align: center;
-        font-size: 1rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        outline: none;
+        transition: border-color 0.2s;
       }
 
+      .settings input:focus {
+        border-color: var(--accent);
+      }
+
+      .settings span {
+        font-size: 1rem;
+        color: var(--text-muted);
+      }
+
+      /* Grid UI */
       .grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+        grid-template-columns: repeat(2, 1fr);
         gap: 20px;
       }
 
+      @media (min-width: 520px) {
+        .grid {
+          grid-template-columns: repeat(4, 1fr);
+        }
+      }
+
       .timer {
-        background: var(--card);
-        border-radius: 18px;
-        padding: 30px;
-        text-align: center;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 24px; /* Slightly rounder */
+        padding: 32px 16px; /* Increased padding */
+        min-height: 130px; /* Taller height for better clickability */
+        display: flex;
+        align-items: center;
+        justify-content: center;
         cursor: pointer;
-        transition: 0.25s;
+        transition: all 0.2s ease;
+        box-shadow: var(--shadow);
         user-select: none;
-        border: 1px solid rgba(255, 255, 255, 0.05);
       }
 
       .timer:hover {
-        transform: translateY(-4px);
-        background: var(--card-hover);
+        transform: translateY(-2px);
+        background: var(--surface-hover);
+        border-color: var(--text-muted);
+      }
+
+      .timer:active {
+        transform: translateY(1px);
       }
 
       .timer.running {
-        outline: 3px solid var(--accent);
+        border-color: var(--accent);
+        box-shadow: 0 0 0 4px var(--accent-glow);
+        background: var(--surface);
       }
 
       .timer h2 {
-        font-size: 2.6rem;
+        font-size: 2.8rem; /* Larger text */
+        font-weight: 700;
+        display: flex;
+        align-items: baseline;
+        justify-content: center;
+        gap: 6px;
       }
 
-      .timer p {
-        margin-top: 10px;
-        color: var(--muted);
+      .timer h2 span {
+        font-size: 1.2rem; /* Larger unit text */
+        font-weight: 500;
+        color: var(--text-muted);
       }
 
-      .status {
-        margin-top: 35px;
+      /* Status Display */
+      .display-area {
+        background: var(--surface);
+        border-radius: 24px;
+        border: 1px solid var(--border);
+        padding: 40px 20px;
         text-align: center;
-        font-size: 1.1rem;
-        min-height: 30px;
+        box-shadow: var(--shadow);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 220px;
       }
 
-      .big {
-        font-size: 4rem;
-        margin-top: 10px;
-        font-weight: bold;
+      #message {
+        font-size: 1.2rem;
+        font-weight: 500;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 8px;
       }
 
+      #countdown {
+        font-size: 5rem;
+        font-weight: 800;
+        line-height: 1;
+        font-variant-numeric: tabular-nums;
+        color: var(--text-main);
+        height: 80px;
+      }
+
+      /* Controls */
       .controls {
         display: flex;
         justify-content: center;
-        margin-top: 30px;
+        height: 60px; /* Taller container */
       }
 
       button {
-        padding: 14px 28px;
+        padding: 0 40px;
+        height: 60px; /* Taller button for easier tapping */
+        width: 100%;
+        max-width: 280px; /* Widens the button on mobile */
         border: none;
-        border-radius: 12px;
+        border-radius: 100px;
         cursor: pointer;
         background: var(--danger);
         color: white;
-        font-size: 1rem;
-        transition: 0.2s;
+        font-size: 1.2rem; /* Larger font */
+        font-weight: 600;
+        transition: all 0.2s;
+        box-shadow: 0 4px 6px rgba(239, 68, 68, 0.2);
       }
 
       button:hover {
-        filter: brightness(1.1);
+        background: var(--danger-hover);
+        transform: translateY(-1px);
+        box-shadow: 0 6px 8px rgba(239, 68, 68, 0.3);
+      }
+
+      button:active {
+        transform: translateY(1px);
       }
 
       .hidden {
-        display: none;
+        display: none !important;
       }
     </style>
   </head>
 
   <body>
     <div class="container">
-      <h1>🏋 Workout Timer</h1>
-      <div class="subtitle">Click any timer to begin.</div>
-
       <div class="settings">
         <label>Start Delay</label>
-        <input id="delayInput" type="number" value="3" min="0" />
-        <span>seconds</span>
+        <div class="input-wrapper">
+          <input id="delayInput" type="number" value="5" min="0" />
+          <span>sec</span>
+        </div>
       </div>
 
       <div class="grid">
         <div class="timer" data-time="15">
-          <h2>15</h2>
-          <p>seconds</p>
+          <h2>15<span>s</span></h2>
         </div>
-
         <div class="timer" data-time="30">
-          <h2>30</h2>
-          <p>seconds</p>
+          <h2>30<span>s</span></h2>
         </div>
-
         <div class="timer" data-time="45">
-          <h2>45</h2>
-          <p>seconds</p>
+          <h2>45<span>s</span></h2>
         </div>
-
         <div class="timer" data-time="60">
-          <h2>60</h2>
-          <p>seconds</p>
+          <h2>60<span>s</span></h2>
         </div>
       </div>
 
-      <div class="status">
+      <div class="display-area">
         <div id="message">Ready</div>
-        <div id="countdown" class="big"></div>
+        <div id="countdown"></div>
       </div>
 
       <div class="controls">
-        <button id="cancel" class="hidden">Cancel Timer</button>
+        <button id="cancel" class="hidden">Cancel</button>
       </div>
     </div>
 
@@ -203,62 +300,57 @@
       let currentCard = null;
       let audioCtx = null;
 
-      /* 
-  Studio-Grade Audio Engine
-  Uses physical acoustic synthesis & an anti-clipping limiter to generate
-  real-world gym acoustics (Pea Whistle & Boxing Bell) without distortion.
-*/
+      // Restore saved delay from LocalStorage
+      const savedDelay = localStorage.getItem("workoutTimerDelay");
+      if (savedDelay !== null) {
+        delayInput.value = savedDelay;
+      }
+
+      // Save delay to LocalStorage on change
+      delayInput.addEventListener("input", () => {
+        localStorage.setItem("workoutTimerDelay", delayInput.value);
+      });
+
       function getAudioContext() {
         if (!audioCtx)
           audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         return audioCtx;
       }
 
-      /* 
-  Physical Model: Pea Whistle
-  Simulates a resonant whistle chamber with a rapidly spinning pea interrupting
-  the airflow (~22 Hz amplitude modulation) and an air-pressure pitch bend.
-*/
       function playWhistleBurst(delayOffset, duration) {
         const ctx = getAudioContext();
         const now = ctx.currentTime + delayOffset;
 
-        // Brickwall Limiter: Maximizes loudness while preventing digital clipping/distortion
         const limiter = ctx.createDynamicsCompressor();
         limiter.threshold.setValueAtTime(-2, now);
         limiter.ratio.setValueAtTime(15, now);
         limiter.attack.setValueAtTime(0.003, now);
         limiter.connect(ctx.destination);
 
-        // LFO (Low Frequency Oscillator) to simulate the spinning pea fluttering the air
         const lfo = ctx.createOscillator();
         const lfoGain = ctx.createGain();
         lfo.type = "sine";
-        lfo.frequency.setValueAtTime(22, now); // ~22 pea flutters per second
+        lfo.frequency.setValueAtTime(22, now);
         lfoGain.gain.setValueAtTime(0.35, now);
         lfo.connect(lfoGain);
         lfo.start(now);
         lfo.stop(now + duration);
 
-        // Twin acoustic chamber tones for a rich, hollow whistle sound
         [2250, 2320].forEach((freq) => {
           const osc = ctx.createOscillator();
           const gain = ctx.createGain();
 
-          osc.type = "triangle"; // Smooth, airy acoustic pipe waveform
-
-          // Air pressure pitch bend: pitch rises slightly as breath hits the chamber
+          osc.type = "triangle";
           osc.frequency.setValueAtTime(freq * 0.9, now);
           osc.frequency.linearRampToValueAtTime(freq, now + 0.04);
 
-          // Volume envelope
           gain.gain.setValueAtTime(0, now);
           gain.gain.linearRampToValueAtTime(0.5, now + 0.03);
           gain.gain.setValueAtTime(0.5, now + duration - 0.04);
           gain.gain.linearRampToValueAtTime(0.0001, now + duration);
 
           osc.connect(gain);
-          lfoGain.connect(gain.gain); // Apply the spinning pea flutter to the volume
+          lfoGain.connect(gain.gain);
           gain.connect(limiter);
 
           osc.start(now);
@@ -267,63 +359,8 @@
       }
 
       function startSound() {
-        // A classic referee/trainer start: one short chirp followed by a commanding blow
         playWhistleBurst(0, 0.15);
         playWhistleBurst(0.22, 0.45);
-      }
-
-      /* 
-  Physical Model: Gym / Boxing Bell
-  Simulates a bronze/steel gong struck by a mallet. Stacking inharmonic partials
-  (non-integer frequency ratios) creates authentic metallic resonance and ring-out.
-*/
-      function playBellStrike(delayOffset = 0) {
-        const ctx = getAudioContext();
-        const now = ctx.currentTime + delayOffset;
-
-        // Brickwall Limiter to ensure maximum punch without speaker distortion
-        const limiter = ctx.createDynamicsCompressor();
-        limiter.threshold.setValueAtTime(-2, now);
-        limiter.ratio.setValueAtTime(15, now);
-        limiter.attack.setValueAtTime(0.002, now);
-        limiter.connect(ctx.destination);
-
-        const fundamental = 520;
-        // Inharmonic modal ratios for real metal acoustics
-        const partials = [
-          { ratio: 1.0, decay: 1.8, vol: 0.6 }, // Deep body resonance
-          { ratio: 1.34, decay: 1.3, vol: 0.45 }, // Metallic overtone 1
-          { ratio: 1.89, decay: 0.9, vol: 0.35 }, // Metallic overtone 2
-          { ratio: 2.76, decay: 0.6, vol: 0.25 }, // Metallic overtone 3
-          { ratio: 4.12, decay: 0.35, vol: 0.2 }, // High metallic sheen
-          { ratio: 6.03, decay: 0.12, vol: 0.3 }, // Initial hammer strike clink
-        ];
-
-        partials.forEach((p) => {
-          const osc = ctx.createOscillator();
-          const gain = ctx.createGain();
-
-          osc.type = "sine";
-          osc.frequency.setValueAtTime(fundamental * p.ratio, now);
-
-          // Sharp strike attack, followed by a smooth natural metallic decay
-          gain.gain.setValueAtTime(0.001, now);
-          gain.gain.linearRampToValueAtTime(p.vol, now + 0.005);
-          gain.gain.exponentialRampToValueAtTime(0.0001, now + p.decay);
-
-          osc.connect(gain);
-          gain.connect(limiter);
-
-          osc.start(now);
-          osc.stop(now + p.decay);
-        });
-      }
-
-      function finishSound() {
-        // Classic 3-bell gym/boxing round finish (Ding! Ding! Ding!)
-        playBellStrike(0);
-        playBellStrike(0.25);
-        playBellStrike(0.5);
       }
 
       function clearEverything() {
@@ -338,14 +375,18 @@
 
       function cancel() {
         clearEverything();
-        message.textContent = "Cancelled";
+        message.textContent = "Ready";
       }
 
       cancelBtn.onclick = cancel;
 
       document.querySelectorAll(".timer").forEach((card) => {
         card.onclick = () => {
-          if (running) return;
+          // If a timer is already running, this clears it to immediately start the new one
+          if (running) {
+            clearEverything();
+          }
+
           running = true;
           currentCard = card;
           card.classList.add("running");
@@ -354,7 +395,7 @@
           const delay = Math.max(0, Number(delayInput.value) || 0);
           let remain = delay;
 
-          message.textContent = "Starting...";
+          message.textContent = "Starting In";
           countdown.textContent = remain;
 
           interval = setInterval(() => {
@@ -376,7 +417,10 @@
 
               if (left <= 0) {
                 clearInterval(interval);
-                finishSound();
+
+                // Reusing the start sound for the finish as requested
+                startSound();
+
                 message.textContent = "Finished 🎉";
                 countdown.textContent = "";
                 running = false;
