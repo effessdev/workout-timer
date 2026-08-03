@@ -15,7 +15,7 @@
         --text-main: #111827;
         --text-muted: #6b7280;
         --accent: #4f46e5;
-        --accent-glow: rgba(79, 70, 229, 0.15);
+        --accent-glow: rgba(79, 70, 229, 0.2);
         --danger: #ef4444;
         --danger-hover: #dc2626;
         --shadow:
@@ -32,7 +32,7 @@
           --text-main: #f8fafc;
           --text-muted: #94a3b8;
           --accent: #2dd4bf;
-          --accent-glow: rgba(45, 212, 191, 0.15);
+          --accent-glow: rgba(45, 212, 191, 0.2);
           --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
         }
       }
@@ -59,8 +59,8 @@
         align-items: center;
         padding: 20px;
         transition:
-          background-color 0.3s,
-          color 0.3s;
+          background-color 0.4s ease,
+          color 0.4s ease;
       }
 
       .container {
@@ -69,6 +69,35 @@
         display: flex;
         flex-direction: column;
         gap: 2rem;
+      }
+
+      /* Page Load Stagger Animation */
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(16px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .container > * {
+        animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+      }
+
+      .settings {
+        animation-delay: 0.05s;
+      }
+      .grid {
+        animation-delay: 0.12s;
+      }
+      .display-area {
+        animation-delay: 0.19s;
+      }
+      .controls {
+        animation-delay: 0.26s;
       }
 
       /* Settings UI */
@@ -84,13 +113,22 @@
         box-shadow: var(--shadow);
         width: fit-content;
         margin: 0 auto;
-        transition: all 0.3s;
+        transition:
+          background-color 0.3s ease,
+          border-color 0.3s ease,
+          box-shadow 0.3s ease,
+          transform 0.2s ease;
+      }
+
+      .settings:hover {
+        border-color: var(--text-muted);
       }
 
       .settings label {
         font-size: 1rem;
         font-weight: 500;
         color: var(--text-muted);
+        transition: color 0.3s ease;
       }
 
       .input-wrapper {
@@ -110,11 +148,16 @@
         font-size: 1.1rem;
         font-weight: 600;
         outline: none;
-        transition: border-color 0.2s;
+        transition:
+          border-color 0.2s ease,
+          box-shadow 0.2s ease,
+          background-color 0.3s ease,
+          color 0.3s ease;
       }
 
       .settings input:focus {
         border-color: var(--accent);
+        box-shadow: 0 0 0 3px var(--accent-glow);
       }
 
       .settings span {
@@ -138,45 +181,73 @@
       .timer {
         background: var(--surface);
         border: 1px solid var(--border);
-        border-radius: 24px; /* Slightly rounder */
-        padding: 32px 16px; /* Increased padding */
-        min-height: 130px; /* Taller height for better clickability */
+        border-radius: 24px;
+        padding: 32px 16px;
+        min-height: 130px;
         display: flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        transition: all 0.2s ease;
+        transition:
+          transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+          background-color 0.25s ease,
+          border-color 0.25s ease,
+          box-shadow 0.25s ease;
         box-shadow: var(--shadow);
         user-select: none;
       }
 
       .timer:hover {
-        transform: translateY(-2px);
+        transform: translateY(-4px) scale(1.02);
         background: var(--surface-hover);
         border-color: var(--text-muted);
       }
 
       .timer:active {
-        transform: translateY(1px);
+        transform: translateY(1px) scale(0.98);
+      }
+
+      /* Running Timer Pulse Animation */
+      @keyframes pulseGlow {
+        0% {
+          box-shadow:
+            0 0 0 0px var(--accent-glow),
+            var(--shadow);
+        }
+        50% {
+          box-shadow:
+            0 0 0 8px var(--accent-glow),
+            var(--shadow);
+        }
+        100% {
+          box-shadow:
+            0 0 0 0px var(--accent-glow),
+            var(--shadow);
+        }
       }
 
       .timer.running {
         border-color: var(--accent);
-        box-shadow: 0 0 0 4px var(--accent-glow);
         background: var(--surface);
+        animation: pulseGlow 2s infinite cubic-bezier(0.4, 0, 0.6, 1);
       }
 
       .timer h2 {
-        font-size: 2.8rem; /* Larger text */
+        font-size: 2.8rem;
         font-weight: 700;
         display: flex;
         align-items: baseline;
         justify-content: center;
         gap: 6px;
+        transition: transform 0.2s ease;
+      }
+
+      .timer:hover h2 {
+        transform: scale(1.05);
       }
 
       .timer h2 span {
-        font-size: 1.2rem; /* Larger unit text */
+        font-size: 1.2rem;
         font-weight: 500;
         color: var(--text-muted);
       }
@@ -194,6 +265,10 @@
         align-items: center;
         justify-content: center;
         min-height: 220px;
+        transition:
+          background-color 0.3s ease,
+          border-color 0.3s ease,
+          transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
       }
 
       #message {
@@ -203,6 +278,24 @@
         text-transform: uppercase;
         letter-spacing: 2px;
         margin-bottom: 8px;
+        transition:
+          opacity 0.2s ease,
+          transform 0.2s ease;
+      }
+
+      #message.pop {
+        animation: messagePop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+
+      @keyframes messagePop {
+        0% {
+          opacity: 0;
+          transform: translateY(-8px) scale(0.95);
+        }
+        100% {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
       }
 
       #countdown {
@@ -212,43 +305,97 @@
         font-variant-numeric: tabular-nums;
         color: var(--text-main);
         height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: color 0.3s ease;
+      }
+
+      #countdown.tick {
+        animation: tickPop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+
+      @keyframes tickPop {
+        0% {
+          transform: scale(0.7);
+          opacity: 0.4;
+        }
+        50% {
+          transform: scale(1.12);
+          opacity: 1;
+        }
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+
+      /* Celebration Pop for Finished State */
+      .display-area.finished {
+        animation: celebrate 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+
+      @keyframes celebrate {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.03);
+          border-color: var(--accent);
+        }
+        100% {
+          transform: scale(1);
+        }
       }
 
       /* Controls */
       .controls {
         display: flex;
         justify-content: center;
-        height: 60px; /* Taller container */
+        height: 60px;
       }
 
       button {
         padding: 0 40px;
-        height: 60px; /* Taller button for easier tapping */
+        height: 60px;
         width: 100%;
-        max-width: 280px; /* Widens the button on mobile */
+        max-width: 280px;
         border: none;
         border-radius: 100px;
         cursor: pointer;
         background: var(--danger);
         color: white;
-        font-size: 1.2rem; /* Larger font */
+        font-size: 1.2rem;
         font-weight: 600;
-        transition: all 0.2s;
         box-shadow: 0 4px 6px rgba(239, 68, 68, 0.2);
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0) scale(1);
+        transition:
+          transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+          opacity 0.25s ease,
+          visibility 0.25s ease,
+          background-color 0.2s ease,
+          box-shadow 0.2s ease;
       }
 
       button:hover {
         background: var(--danger-hover);
-        transform: translateY(-1px);
-        box-shadow: 0 6px 8px rgba(239, 68, 68, 0.3);
+        transform: translateY(-2px) scale(1.02);
+        box-shadow: 0 6px 12px rgba(239, 68, 68, 0.3);
       }
 
       button:active {
-        transform: translateY(1px);
+        transform: translateY(1px) scale(0.98);
       }
 
+      /* Smooth display toggle for cancel button */
       .hidden {
-        display: none !important;
+        display: block !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+        transform: translateY(10px) scale(0.92) !important;
       }
     </style>
   </head>
@@ -278,7 +425,7 @@
         </div>
       </div>
 
-      <div class="display-area">
+      <div class="display-area" id="displayArea">
         <div id="message">Ready</div>
         <div id="countdown"></div>
       </div>
@@ -293,12 +440,31 @@
       const countdown = document.getElementById("countdown");
       const cancelBtn = document.getElementById("cancel");
       const delayInput = document.getElementById("delayInput");
+      const displayArea = document.getElementById("displayArea");
 
       let timeout = null;
       let interval = null;
       let running = false;
       let currentCard = null;
       let audioCtx = null;
+
+      // Animated text state updates
+      function setMessage(text) {
+        if (message.textContent === text) return;
+        message.textContent = text;
+        message.classList.remove("pop");
+        void message.offsetWidth; // Force reflow to re-trigger animation
+        message.classList.add("pop");
+      }
+
+      function setCountdown(text) {
+        countdown.textContent = text;
+        countdown.classList.remove("tick");
+        void countdown.offsetWidth; // Force reflow to re-trigger animation
+        if (text !== "") {
+          countdown.classList.add("tick");
+        }
+      }
 
       // Restore saved delay from LocalStorage
       const savedDelay = localStorage.getItem("workoutTimerDelay");
@@ -370,19 +536,19 @@
         cancelBtn.classList.add("hidden");
         if (currentCard) currentCard.classList.remove("running");
         currentCard = null;
-        countdown.textContent = "";
+        setCountdown("");
       }
 
       function cancel() {
         clearEverything();
-        message.textContent = "Ready";
+        setMessage("Ready");
       }
 
       cancelBtn.onclick = cancel;
 
       document.querySelectorAll(".timer").forEach((card) => {
         card.onclick = () => {
-          // If a timer is already running, this clears it to immediately start the new one
+          // If a timer is already running, clear it first
           if (running) {
             clearEverything();
           }
@@ -395,12 +561,14 @@
           const delay = Math.max(0, Number(delayInput.value) || 0);
           let remain = delay;
 
-          message.textContent = "Starting In";
-          countdown.textContent = remain;
+          setMessage("Starting In");
+          setCountdown(remain);
 
           interval = setInterval(() => {
             remain--;
-            if (remain > 0) countdown.textContent = remain;
+            if (remain > 0) {
+              setCountdown(remain);
+            }
           }, 1000);
 
           timeout = setTimeout(() => {
@@ -408,21 +576,27 @@
             startSound();
 
             let left = Number(card.dataset.time);
-            message.textContent = "Workout!";
-            countdown.textContent = left;
+            setMessage("Workout!");
+            setCountdown(left);
 
             interval = setInterval(() => {
               left--;
-              countdown.textContent = left;
+              setCountdown(left);
 
               if (left <= 0) {
                 clearInterval(interval);
 
-                // Reusing the start sound for the finish as requested
+                // Reusing whistle sound for finish
                 startSound();
 
-                message.textContent = "Finished 🎉";
-                countdown.textContent = "";
+                setMessage("Finished 🎉");
+                setCountdown("");
+
+                // Trigger celebration bounce animation
+                displayArea.classList.remove("finished");
+                void displayArea.offsetWidth;
+                displayArea.classList.add("finished");
+
                 running = false;
                 card.classList.remove("running");
                 cancelBtn.classList.add("hidden");
